@@ -37,9 +37,8 @@ pub mod maintenance {
     pub async fn ready() -> Ready {
         let result = get(&ready_url(), "".to_owned(), "".to_owned()).await;
         match result {
-            Ok(v) => Ready::Yes,
-            Err(e) => Ready::No,
-            _ => Ready::No,
+            Ok(_v) => Ready::Yes,
+            Err(_e) => Ready::No,
         }
     }
 }
@@ -68,7 +67,96 @@ pub mod examples {
             }
 
             Err(e) => Err(e.to_string()),
-            _ => Err("".to_string()),
+        }
+    }
+
+    pub fn examplenewtrans() -> Result<String, String> {
+        let result = block_on(get(&links::examplenewtrans(), "".to_owned(), "".to_owned()));
+
+        match result {
+            Ok(v) => {
+                let body = block_on(v.text());
+                match body {
+                    Ok(v) => Ok(v),
+                    Err(e) => Err(e.to_string()),
+                }
+            }
+
+            Err(e) => Err(e.to_string()),
+        }
+    }
+}
+
+pub mod translate {
+
+    use futures::executor::block_on;
+    use translation_server_dtos_silen::{TransReq, TransResponse};
+
+    use super::links;
+    use crate::request::post;
+
+    pub fn translate(content: &str, from: &str, to: &str) -> Result<TransResponse, String> {
+        let req = TransReq::new(content, from, to);
+        let as_json = serde_json::to_string(&req).map_err(|e| e.to_string())?;
+
+        let result = block_on(post(
+            &links::translate(),
+            "".to_owned(),
+            "".to_owned(),
+            as_json,
+        ));
+
+        match result {
+            Ok(v) => {
+                let body = block_on(v.text());
+                match body {
+                    Ok(v) => {
+                        let response: TransResponse =
+                            serde_json::from_str(v.as_str()).map_err(|e| e.to_string())?;
+                        Ok(response)
+                    }
+                    Err(e) => Err(e.to_string()),
+                }
+            }
+
+            Err(e) => Err(e.to_string()),
+        }
+    }
+}
+
+pub mod newtrans {
+
+    use futures::executor::block_on;
+    use translation_server_dtos_silen::NewTransReq;
+
+    use super::links;
+    use crate::request::post;
+
+    pub fn newtrans(
+        from_lang: &str,
+        to_lang: &str,
+        word: &str,
+        meanings: Vec<&str>,
+    ) -> Result<String, String> {
+        let req = NewTransReq::new(from_lang, to_lang, word, meanings);
+        let as_json = serde_json::to_string(&req).map_err(|e| e.to_string())?;
+
+        let result = block_on(post(
+            &links::newtrans(),
+            "".to_owned(),
+            "".to_owned(),
+            as_json,
+        ));
+
+        match result {
+            Ok(v) => {
+                let body = block_on(v.text());
+                match body {
+                    Ok(v) => Ok(v),
+                    Err(e) => Err(e.to_string()),
+                }
+            }
+            Err(e) => Err(e.to_string()),
         }
     }
 }

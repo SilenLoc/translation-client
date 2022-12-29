@@ -1,3 +1,8 @@
 mod client;
 mod request;
-pub use crate::client::{examples::exampletranslate, maintenance::ready};
+pub use crate::client::{
+    examples::{examplenewtrans, exampletranslate},
+    maintenance::ready,
+    newtrans::newtrans,
+    translate::translate,
+};
