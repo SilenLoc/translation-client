@@ -1,6 +1,6 @@
 mod links {
     fn base_url() -> String {
-        "127.0.0.1:8080".to_string()
+        "http://localhost:8080".to_string()
     }
     pub(crate) fn ready_url() -> String {
         base_url() + r#"/ready"#
