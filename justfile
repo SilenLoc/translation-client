@@ -44,4 +44,4 @@ release *args:
 	npx semantic-release {{args}}  
 
 pub *args:
-	cargo publish
+	cargo publish {{args}}

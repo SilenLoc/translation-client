@@ -31,7 +31,7 @@
         {
           "assets": [
             {
-              "path": "target/release/trans-dto-server"
+              "path": "target/release/trans-client-server"
             }
           ],
           "successComment": ":tada: new version is [${nextRelease.version}](<github_release_url>) :tada:"
