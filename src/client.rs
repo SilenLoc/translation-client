@@ -42,17 +42,15 @@ pub mod maintenance {
 
 pub mod examples {
 
-    use futures::executor::block_on;
-
     use super::links;
     use crate::request::get;
 
-    pub fn exampletranslate() -> Result<String, String> {
-        let result = block_on(get(&links::exampletranslate()));
+    pub async fn exampletranslate() -> Result<String, String> {
+        let result = get(&links::exampletranslate()).await;
 
         match result {
             Ok(v) => {
-                let body = block_on(v.text());
+                let body = v.text().await;
                 match body {
                     Ok(v) => Ok(v),
                     Err(e) => Err(e.to_string()),
@@ -63,12 +61,12 @@ pub mod examples {
         }
     }
 
-    pub fn examplenewtrans() -> Result<String, String> {
-        let result = block_on(get(&links::examplenewtrans()));
+    pub async fn examplenewtrans() -> Result<String, String> {
+        let result = get(&links::examplenewtrans()).await;
 
         match result {
             Ok(v) => {
-                let body = block_on(v.text());
+                let body = v.text().await;
                 match body {
                     Ok(v) => Ok(v),
                     Err(e) => Err(e.to_string()),
@@ -82,21 +80,20 @@ pub mod examples {
 
 pub mod translate {
 
-    use futures::executor::block_on;
     use translation_server_dtos_silen::{TransReq, TransResponse};
 
     use super::links;
     use crate::request::post;
 
-    pub fn translate(content: &str, from: &str, to: &str) -> Result<TransResponse, String> {
+    pub async fn translate(content: &str, from: &str, to: &str) -> Result<TransResponse, String> {
         let req = TransReq::new(content, from, to);
         let as_json = serde_json::to_string(&req).map_err(|e| e.to_string())?;
 
-        let result = block_on(post(&links::translate(), as_json));
+        let result = post(&links::translate(), as_json).await;
 
         match result {
             Ok(v) => {
-                let body = block_on(v.text());
+                let body = v.text().await;
                 match body {
                     Ok(v) => {
                         let response: TransResponse =
@@ -114,13 +111,12 @@ pub mod translate {
 
 pub mod newtrans {
 
-    use futures::executor::block_on;
     use translation_server_dtos_silen::NewTransReq;
 
     use super::links;
     use crate::request::post;
 
-    pub fn newtrans(
+    pub async fn newtrans(
         from_lang: &str,
         to_lang: &str,
         word: &str,
@@ -129,11 +125,11 @@ pub mod newtrans {
         let req = NewTransReq::new(from_lang, to_lang, word, meanings);
         let as_json = serde_json::to_string(&req).map_err(|e| e.to_string())?;
 
-        let result = block_on(post(&links::newtrans(), as_json));
+        let result = post(&links::newtrans(), as_json).await;
 
         match result {
             Ok(v) => {
-                let body = block_on(v.text());
+                let body = v.text().await;
                 match body {
                     Ok(v) => Ok(v),
                     Err(e) => Err(e.to_string()),
