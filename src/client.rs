@@ -80,33 +80,26 @@ pub mod examples {
 
 pub mod translate {
 
-    use translation_server_dtos_silen::{TransReq, TransResponse};
+    use translation_server_dtos_silen::{TransReq, TransResponse, TransErr};
 
     use super::links;
     use crate::request::post;
 
-    pub async fn translate(content: &str, from: &str, to: &str) -> Result<TransResponse, String> {
+    pub async fn translate(content: &str, from: &str, to: &str) -> Result<TransResponse, TransErr> {
         let req = TransReq::new(content, from, to);
-        let as_json = serde_json::to_string(&req).map_err(|e| e.to_string())?;
+        let as_json = serde_json::to_string(&req).map_err(|e| e.to_string()).map_err(|e|TransErr::new(e.as_str()))?;
 
+       
         let result = post(&links::translate(), as_json).await;
 
-        match result {
-            Ok(v) => {
-                let body = v.text().await;
-                match body {
-                    Ok(v) => {
-                        let response: TransResponse =
-                            serde_json::from_str(v.as_str()).map_err(|e| e.to_string())?;
-                        Ok(response)
-                    }
-                    Err(e) => Err(e.to_string()),
-                }
-            }
+        let only_response = result.map_err(|e| TransErr::new(&e.to_string()))?;
 
-            Err(e) => Err(e.to_string()),
-        }
-    }
+        let body = only_response.text().await.map_err(|e| TransErr::new(&e.to_string()))?;
+
+        let as_response: TransResponse =serde_json::from_str(body.as_str()).map_err(|e| TransErr::new(&e.to_string()))?;
+
+        Ok(as_response)
+}
 }
 
 pub mod newtrans {
