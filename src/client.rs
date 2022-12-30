@@ -25,20 +25,17 @@ mod links {
 
 pub mod maintenance {
 
+    use reqwest::Response;
+
     use crate::request::get;
 
     use super::links::ready_url;
 
-    pub enum Ready {
-        Yes,
-        No,
-    }
-
-    pub async fn ready() -> Ready {
+    pub async fn ready() -> Result<Response, String> {
         let result = get(&ready_url(), "".to_owned(), "".to_owned()).await;
         match result {
-            Ok(_v) => Ready::Yes,
-            Err(_e) => Ready::No,
+            Ok(v) => Ok(v),
+            Err(e) => Err(e.to_string()),
         }
     }
 }
