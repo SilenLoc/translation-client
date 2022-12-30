@@ -32,7 +32,7 @@ pub mod maintenance {
     use super::links::ready_url;
 
     pub async fn ready() -> Result<Response, String> {
-        let result = get(&ready_url(), "".to_owned(), "".to_owned()).await;
+        let result = get(&ready_url()).await;
         match result {
             Ok(v) => Ok(v),
             Err(e) => Err(e.to_string()),
@@ -48,11 +48,7 @@ pub mod examples {
     use crate::request::get;
 
     pub fn exampletranslate() -> Result<String, String> {
-        let result = block_on(get(
-            &links::exampletranslate(),
-            "".to_owned(),
-            "".to_owned(),
-        ));
+        let result = block_on(get(&links::exampletranslate()));
 
         match result {
             Ok(v) => {
@@ -68,7 +64,7 @@ pub mod examples {
     }
 
     pub fn examplenewtrans() -> Result<String, String> {
-        let result = block_on(get(&links::examplenewtrans(), "".to_owned(), "".to_owned()));
+        let result = block_on(get(&links::examplenewtrans()));
 
         match result {
             Ok(v) => {
@@ -96,12 +92,7 @@ pub mod translate {
         let req = TransReq::new(content, from, to);
         let as_json = serde_json::to_string(&req).map_err(|e| e.to_string())?;
 
-        let result = block_on(post(
-            &links::translate(),
-            "".to_owned(),
-            "".to_owned(),
-            as_json,
-        ));
+        let result = block_on(post(&links::translate(), as_json));
 
         match result {
             Ok(v) => {
@@ -138,12 +129,7 @@ pub mod newtrans {
         let req = NewTransReq::new(from_lang, to_lang, word, meanings);
         let as_json = serde_json::to_string(&req).map_err(|e| e.to_string())?;
 
-        let result = block_on(post(
-            &links::newtrans(),
-            "".to_owned(),
-            "".to_owned(),
-            as_json,
-        ));
+        let result = block_on(post(&links::newtrans(), as_json));
 
         match result {
             Ok(v) => {
