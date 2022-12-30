@@ -95,15 +95,27 @@ pub mod translate {
 
         let only_response = result.map_err(|e| TransErr::new(&e.to_string()))?;
 
-        let body = only_response
-            .text()
-            .await
-            .map_err(|e| TransErr::new(&e.to_string()))?;
+        if only_response.status().is_success() {
+            let body = only_response
+                .text()
+                .await
+                .map_err(|e| TransErr::new(&e.to_string()))?;
 
-        let as_response: TransResponse =
-            serde_json::from_str(body.as_str()).map_err(|e| TransErr::new(&e.to_string()))?;
+            let as_response: TransResponse =
+                serde_json::from_str(body.as_str()).map_err(|e| TransErr::new(&e.to_string()))?;
 
-        Ok(as_response)
+            Ok(as_response)
+        } else {
+            let body = only_response
+                .text()
+                .await
+                .map_err(|e| TransErr::new(&e.to_string()))?;
+
+            let as_response: TransErr =
+                serde_json::from_str(body.as_str()).map_err(|e| TransErr::new(&e.to_string()))?;
+
+            Err(as_response)
+        }
     }
 }
 
